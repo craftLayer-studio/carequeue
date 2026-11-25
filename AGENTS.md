@@ -61,7 +61,7 @@ Health data is high-stakes. Product, copy and agents must treat it carefully.
 
 ## Rules for agents editing this folder
 
-- Follow [CONVENTIONS.md](../CONVENTIONS.md).
+- Follow [CONVENTIONS.md](https://github.com/craftLayer-studio/craftlayer-products/blob/main/CONVENTIONS.md).
 - Never add a feature that gives a patient or staff member clinical advice. If unsure, it is out of scope.
 - Every new number needs a source link with access date, or **(estimate)** with reasoning.
 - Tie every feature to one metric: acquisition, activation, retention, revenue or referral.

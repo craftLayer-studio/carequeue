@@ -110,7 +110,7 @@ Out of MVP on purpose: full EMR, billing with insurance, pharmacy stock, ABDM (P
 
 ## Data model (product-specific entities)
 
-Core entities (tenant, customer, consent, message, payment, review) live in [core](../../core/README.md). CareQueue adds:
+Core entities (tenant, customer, consent, message, payment, review) live in [core](https://github.com/craftLayer-studio/craftlayer-core/blob/main/README.md). CareQueue adds:
 
 | Entity | Key fields | Retention (draft, confirm with counsel) |
 |---|---|---|
