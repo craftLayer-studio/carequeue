@@ -16,7 +16,7 @@ import {
   type Priority,
   type QueueAction,
   type QueueToken,
-  type Registration,
+  type RegistrationInput,
   type TokenKind,
   type TokenStatus,
 } from "@/domain";
@@ -78,7 +78,7 @@ export interface IssueTokenInput {
 
 export interface RegisterAndQueueInput {
   doctorId: string;
-  registration: Registration;
+  registration: RegistrationInput;
   consent: ConsentChoices;
   priority?: Priority;
 }
@@ -158,8 +158,8 @@ export async function joinFromQr(db: Db, qrToken: string, input: Omit<RegisterAn
   return db.transaction(async (tx) => {
     const org = await getOrgByQr(tx, qrToken);
     await getDoctor(tx, org.id, input.doctorId);
-    const { patient } = await registerPatient(tx, org.id, input.registration, input.consent, "qr", now);
-    const { token } = await issueToken(tx, org.id, { doctorId: input.doctorId, patientId: patient.id, reason: input.registration.reason }, now);
+    const { patient, registration } = await registerPatient(tx, org.id, input.registration, input.consent, "qr", now);
+    const { token } = await issueToken(tx, org.id, { doctorId: input.doctorId, patientId: patient.id, reason: registration.reason }, now);
     return { publicToken: token.publicToken };
   });
 }
@@ -169,11 +169,11 @@ export async function addWalkIn(db: Db, actor: Actor, input: RegisterAndQueueInp
   assertQueueAccess(actor, input.doctorId);
   return db.transaction(async (tx) => {
     await getDoctor(tx, actor.orgId, input.doctorId);
-    const { patient } = await registerPatient(tx, actor.orgId, input.registration, input.consent, "staff", now);
+    const { patient, registration } = await registerPatient(tx, actor.orgId, input.registration, input.consent, "staff", now);
     const { token, created } = await issueToken(
       tx,
       actor.orgId,
-      { doctorId: input.doctorId, patientId: patient.id, reason: input.registration.reason, priority: input.priority, kind: "walkin" },
+      { doctorId: input.doctorId, patientId: patient.id, reason: registration.reason, priority: input.priority, kind: "walkin" },
       now,
     );
     await audit(tx, actor, actor.orgId, "token.create", "token", token.id, null, now);

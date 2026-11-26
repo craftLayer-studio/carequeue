@@ -15,6 +15,7 @@ import {
   type ConsentChannel,
   type ConsentState,
   type Registration,
+  type RegistrationInput,
   validateRegistration,
 } from "@/domain";
 import type { Tx } from "../db/client";
@@ -41,11 +42,11 @@ export interface ConsentChoices {
 export async function registerPatient(
   tx: Tx,
   orgId: string,
-  input: Registration,
+  input: RegistrationInput,
   choices: ConsentChoices,
   channel: ConsentChannel,
   now = new Date(),
-): Promise<{ contact: Contact; patient: Patient }> {
+): Promise<{ contact: Contact; patient: Patient; registration: Registration }> {
   // Re-validate here so no caller can skip normalisation (phone to E.164, name, age bounds).
   const checked = validateRegistration(input);
   if (!checked.ok) throw new StoreError(400, Object.values(checked.errors).join(". "));
@@ -85,7 +86,7 @@ export async function registerPatient(
   }
 
   await recordConsent(tx, orgId, contact.id, choices, channel, now, true);
-  return { contact, patient };
+  return { contact, patient, registration: reg };
 }
 
 /**

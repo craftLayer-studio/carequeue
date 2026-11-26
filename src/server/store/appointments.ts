@@ -14,7 +14,7 @@ import {
   tokenLabel,
   type DoctorSchedule,
   type IsoDay,
-  type Registration,
+  type RegistrationInput,
 } from "@/domain";
 import { appUrl } from "../config";
 import type { Db, Tx } from "../db/client";
@@ -73,7 +73,7 @@ export async function availableSlots(db: Db, qrToken: string, doctorId: string, 
 export async function bookAppointment(
   db: Db,
   qrToken: string,
-  input: { doctorId: string; startsAt: Date; registration: Registration; consent: ConsentChoices },
+  input: { doctorId: string; startsAt: Date; registration: RegistrationInput; consent: ConsentChoices },
   now = new Date(),
 ) {
   try {
@@ -83,7 +83,7 @@ export async function bookAppointment(
       if (!doctor.active) throw new StoreError(400, "This doctor is not taking bookings");
       const booked = await bookedStarts(tx, org.id, doctor.id, istDay(input.startsAt));
       if (!isBookable(scheduleOf(doctor), input.startsAt, booked, now)) throw new StoreError(409, "That time is no longer available. Pick another slot.");
-      const { contact, patient } = await registerPatient(tx, org.id, input.registration, input.consent, "booking", now);
+      const { contact, patient, registration } = await registerPatient(tx, org.id, input.registration, input.consent, "booking", now);
       const [appt] = await tx
         .insert(appointments)
         .values({
@@ -94,7 +94,7 @@ export async function bookAppointment(
           startsAt: input.startsAt,
           status: "booked",
           publicToken: randomToken(),
-          reason: input.registration.reason,
+          reason: registration.reason,
           createdAt: now,
         })
         .returning();

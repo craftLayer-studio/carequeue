@@ -13,7 +13,7 @@ export interface RegistrationInput {
   name: string;
   phone: string;
   age: number | string;
-  reason?: string;
+  reason?: string | null;
 }
 
 export interface Registration {
@@ -29,7 +29,6 @@ export type ValidationResult = { ok: true; value: Registration } | { ok: false; 
 
 /** Collapse whitespace and strip control characters. */
 export function cleanText(value: string): string {
-  // eslint-disable-next-line no-control-regex
   return value.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim();
 }
 
