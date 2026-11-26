@@ -1,0 +1,14 @@
+{
+  "name": "carequeue",
+  "like": "matcha",
+  "mode": "both",
+  "settings": [
+    {
+      "thing": "font",
+      "value": "dm-sans",
+      "source": "dial",
+      "on": "heading"
+    }
+  ],
+  "lifted": []
+}
