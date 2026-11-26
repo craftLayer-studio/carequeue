@@ -60,6 +60,65 @@ Full list with P0/P1/P2: [docs/01-product-plan.md](docs/01-product-plan.md).
 
 Shared platform modules: [core](https://github.com/craftLayer-studio/craftlayer-core/blob/main/README.md).
 
+## Status
+
+**MVP, demo data, simulated messaging and payments.** The app runs end to end with one fictional clinic ("Sukoon Family Clinic (Demo)", Lucknow). No WhatsApp message is sent: every message goes to an outbox table shown in the app. UPI uses a standard `upi://pay` intent link and reception confirms receipt; no gateway, no money moves in the demo. Product site: https://carequeue.craftlayer.store
+
+## Run it
+
+Requirements: Node.js 20.9+ and pnpm (version pinned in `package.json`).
+
+```bash
+pnpm install
+cp .env.example .env.local     # optional: APP_URL, SESSION_SECRET, DATABASE_URL
+pnpm dev -p 3101               # http://localhost:3101 (empty DB auto-seeds the demo clinic)
+```
+
+- Data lives in a local PGlite file DB at `./.data/pglite`. Set `DATABASE_URL` to use Postgres instead. Migrations in `drizzle/` run on start.
+- `pnpm db:seed` resets and reseeds the demo clinic and prints the reception QR path.
+- Checks: `pnpm typecheck && pnpm lint && pnpm test && pnpm build`, then `pnpm exec astryx doctor --built .`
+- `dev` and `build` use webpack (`--webpack`) because native SWC/Turbopack does not load on some machines.
+
+## Demo walkthrough
+
+1. Open `/` and use **Try the demo**. The links carry the demo clinic's random QR token.
+2. **Patient** (open on a phone): `/q/<qr>` asks for name, mobile, age, an optional short reason and three separate, unticked consent choices. You get a token and the live page `/s/<token>` with position, estimated wait and who is with the doctor. `/q/<qr>/book` books a slot; `/a/<token>` checks you in on the day. `/m/<token>` lets the patient switch messages off.
+3. **Reception**: `/login`, tap "Receptionist: Sunita Yadav" (the one-time code is shown on screen, labelled demo). `/staff` shows each doctor's queue: Call next, Mark done, Skip, Back to queue, No-show, Elderly priority, walk-ins, UPI link or cash. Also `/staff/appointments`, `/staff/patients`, `/staff/followups` (Send due reminders) and `/staff/outbox`.
+4. **Doctor**: sign in as "Doctor: Dr. Anjali Mehta (consulting)". Sees only her own queue; opens a patient and sets a follow-up date.
+5. **Owner**: sign in as "Owner: Dr. Anjali Mehta". `/owner` shows patients per day, average wait, no-shows, collections, follow-up returns and consent counts, sends review requests and practitioner-approved clinic notices. `/owner/qr` is the printable reception QR sheet, `/owner/settings` edits UPI ID, fees and sessions, `/owner/audit` lists every record view and action.
+6. **Assistant** ("Imran Khan") and the owner see masked mobile numbers; receptionist and doctors see full numbers.
+
+## Built vs planned
+
+| Feature (docs/01 #) | State |
+|---|---|
+| 1 QR token, live queue page, turn alerts at 3 ahead and next | Built (WhatsApp simulated) |
+| 2 Staff app: call next, skip, requeue, no-show, elderly/urgent priority | Built |
+| 3 Self-registration, DPDP consent ledger, family members on one phone | Built |
+| 4 Appointment booking per doctor with check-in | Built (advance fee not yet) |
+| 6 Follow-up dates and reminders, appointment reminders | Built (session plans not yet) |
+| 8 UPI intent link and cash, daily collection summary | Built (no gateway webhook) |
+| 9 Review request to opted-in patients | Built (simulated) |
+| 10 Owner dashboard | Built |
+| Audit log of record views, masked phones by role, rate-limited public endpoints | Built |
+| 5 Practitioner e-Rx, 7 lab report delivery | Planned |
+| P1: TV display, ABDM, multi-branch, DPDP export/delete workflow | Planned |
+
+## Health data rules in the product
+
+- Minimum fields only: name, mobile, age, optional reason (60 characters, with a "do not type symptoms" hint).
+- No diagnosis, triage or medical-advice features. Every WhatsApp template is operational and service messages carry "We cannot answer medical questions here. In an emergency, call 112."
+- Consent: separate unticked choices for visit updates (required for a token), follow-up reminders and clinic news; each stored with purpose, notice version, channel and time. Opt-out link in every reminder.
+- Staff see masked phones unless they are a receptionist or doctor. Every patient record view is written to the audit log.
+
+## Code map
+
+See the **Code** section in [AGENTS.md](AGENTS.md).
+
+## Contact
+
+General: hello@craftlayer.store · Product support: carequeue@craftlayer.store · Commercial licences: licensing@craftlayer.store · https://craftlayer.store
+
 ## Licence
 
 Source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE.md). Personal, educational, research and non-profit use is free. **Any commercial use requires a paid licence or written permission from CraftLayer Studio.** See [COMMERCIAL-LICENSE.md](COMMERCIAL-LICENSE.md).

@@ -67,6 +67,60 @@ Health data is high-stakes. Product, copy and agents must treat it carefully.
 - Tie every feature to one metric: acquisition, activation, retention, revenue or referral.
 - Any new data field about patients needs a stated purpose and retention rule.
 
+## Code
+
+MVP web app: Next.js 16 (App Router, webpack), React 19, TypeScript strict, Astryx design system (custom `carequeue` theme derived from Matcha), Drizzle ORM on Postgres (PGlite in dev and tests), Vitest.
+
+### Structure
+
+```
+src/domain/         Pure rules, no React/Next/IO. Unit tested (*.test.ts next to each file).
+  queue.ts          Token states and transitions, call order, live wait, turn alerts
+  consent.ts        DPDP purposes, notice text, notice version, latest-record-wins
+  patient.ts        Minimal registration fields and validation
+  phone.ts          E.164 normalisation and masking
+  roles.ts          Roles and permissions (who sees full phones)
+  slots.ts          Doctor sessions and appointment slots (IST)
+  followup.ts       Follow-up date rules and reminder timing
+  messages.ts       WhatsApp templates (no medical advice), notice guard
+  metrics.ts        Dashboard: patients per day, average wait, no-shows, collections
+  money.ts, upi.ts, time.ts
+src/server/db/      schema.ts (Drizzle), client.ts (PGlite or pg), seed.ts (demo clinic), CLIs
+src/server/store/   Use cases in transactions; every query filters by org_id
+  messaging.ts      Messaging adapter seam; simulated WhatsApp writes to `outbox`
+  payments.ts       Payment adapter seam; UPI intent link + cash
+src/server/         http.ts (input parsing), session.ts (signed cookie), rate-limit.ts, page.ts (page guard)
+src/app/api/        Thin route handlers: parse, validate, call store, JSON
+src/app/            Pages: / landing, /q/[qr] QR registration, /q/[qr]/book, /s/[pt] live token,
+                    /a/[pt] appointment, /m/[token] manage messages, /login, /staff/*, /owner/*
+src/components/     Astryx UI (patient/, staff/, owner/)
+drizzle/            Generated SQL migrations (commit them)
+themes/carequeue/   Theme source (editor); src/themes/carequeue/ is the app copy
+```
+
+### Commands
+
+```bash
+pnpm install
+pnpm dev -p 3101       # dev server; empty DB auto-seeds the demo clinic
+pnpm db:seed           # reset and reseed the demo clinic
+pnpm db:generate       # new migration after editing schema.ts
+pnpm typecheck && pnpm lint && pnpm test && pnpm build
+pnpm exec astryx doctor --built .
+```
+
+### Rules
+
+- Health data: collect only name, mobile, age and an optional short reason. Any new patient field needs a purpose and retention note in `schema.ts`. No clinical advice, triage or diagnosis features.
+- Every send goes through `sendTemplate`, which checks the purpose-specific consent. Never write to `outbox` directly.
+- Every staff/owner action checks a permission from `domain/roles.ts` on the server. Phones shown to staff go through `phoneFor` (masked unless receptionist or doctor). Patient record views call `audit`.
+- Every business row has `org_id`; every query filters by it. Public links use random tokens, never row ids.
+- Money is integer paise; amounts come from the doctor's fee on the server, never from the request.
+- Times are UTC `timestamptz`; clinic days and display are IST (`domain/time.ts`).
+- Integrations stay behind adapters with simulated defaults. No real API keys or paid services.
+- `dev` and `build` keep `--webpack`.
+- Commits: conventional subjects. Never add a Co-Authored-By trailer or a "Generated with" line.
+
 <!-- ASTRYX:START -->
 Astryx v0.7.17 · 174 components
 CLI: run every command as `pnpm exec astryx <cmd>` (shown below as `astryx ...`).

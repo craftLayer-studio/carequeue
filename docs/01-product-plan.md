@@ -75,16 +75,16 @@ Priority: P0 = MVP, sellable in 6–8 weeks. P1 = months 3–5. P2 = months 6–
 
 | # | Feature | Priority | Core module | Metric |
 |---|---|---|---|---|
-| 1 | Reception QR token, live queue page, WhatsApp turn alerts | P0 | QR engine, booking engine, messaging | Activation |
-| 2 | Staff app: call next, skip, mark no-show, priority (elderly, emergency) | P0 | Staff app | Activation |
-| 3 | Patient self-registration with consent capture and family members under one phone | P0 | CRM | Activation |
-| 4 | Appointment booking (slots or token windows) with optional advance fee | P0 | Booking engine, payments | Acquisition, revenue |
+| 1 | Reception QR token, live queue page, WhatsApp turn alerts (**built**, WhatsApp simulated) | P0 | QR engine, booking engine, messaging | Activation |
+| 2 | Staff app: call next, skip, mark no-show, priority (elderly, emergency) (**built**) | P0 | Staff app | Activation |
+| 3 | Patient self-registration with consent capture and family members under one phone (**built**) | P0 | CRM | Activation |
+| 4 | Appointment booking (slots or token windows) with optional advance fee (**built**, slots only; advance fee not yet) | P0 | Booking engine, payments | Acquisition, revenue |
 | 5 | Practitioner-authored e-Rx with registration number, own templates, sent as secure link | P0 | — (product-specific) | Retention |
-| 6 | Follow-up date and session-plan reminders | P0 | Messaging | Retention, revenue |
+| 6 | Follow-up date and session-plan reminders (**built**: follow-up dates; session plans not yet) | P0 | Messaging | Retention, revenue |
 | 7 | Lab report upload and secure WhatsApp delivery | P0 | Messaging, storage | Activation (labs), retention |
-| 8 | UPI payment link and daily collection summary | P0 | Payments | Revenue |
-| 9 | Google review request (configurable per speciality) | P0 | Reviews | Acquisition |
-| 10 | Owner daily summary: patients seen, average wait, collections, follow-ups due | P0 | Analytics | Retention (of the clinic) |
+| 8 | UPI payment link and daily collection summary (**built**, UPI intent + cash) | P0 | Payments | Revenue |
+| 9 | Google review request (configurable per speciality) (**built**, simulated; per-speciality setting not yet) | P0 | Reviews | Acquisition |
+| 10 | Owner daily summary: patients seen, average wait, collections, follow-ups due (**built**) | P0 | Analytics | Retention (of the clinic) |
 | 11 | TV display mode for current token | P1 | QR engine | Activation |
 | 12 | ABDM M1: ABHA verification and Scan and Share-compatible check-in; HFR/HPR linking | P1 | — (integration) | Activation, revenue (DHIS) |
 | 13 | ABDM M2: link visit records/e-Rx/reports to ABHA (health information provider) | P1 | — (integration) | Revenue (DHIS share) |
@@ -98,6 +98,8 @@ Priority: P0 = MVP, sellable in 6–8 weeks. P1 = months 3–5. P2 = months 6–
 | 21 | ABDM M3: fetch patient records with consent (health information user) | P2 | — | Retention |
 | 22 | Integration with popular EMRs (export/import visit) | P2 | — | Activation |
 | 23 | Multi-branch dashboard | P2 | Analytics | Revenue |
+
+Build status (Nov 2026 MVP): items marked **built** work in the demo app; e-Rx (5) and lab report delivery (7) are not built yet. See README.
 
 ### MVP scope (6–8 weeks, 2 developers + founder)
 
