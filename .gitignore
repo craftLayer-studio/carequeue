@@ -46,3 +46,7 @@ next-env.d.ts
 
 # local data
 .data/
+
+# Astryx theme editor previews (regenerated)
+themes/*/preview.html
+themes/*/*.png
